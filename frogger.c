@@ -29,7 +29,7 @@
 
 
 frog frogger = {
-        .circle={.radius=0.05},
+        .sphere={.radius=0.05},
         .launch_velocity={1.0, 1.0}
 };
 
@@ -66,10 +66,10 @@ int main(int argc, char **argv) {
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-    glLoadIdentity();
+//    glLoadIdentity();
 
-//    glRotated(0.5, 0.0, 1.0, 0);
-//    glutPostRedisplay();
+    glRotated(0.5, 0.0, 1.0, 0);
+    glutPostRedisplay();
 
     draw_sphere();
     draw_parabola();
@@ -103,10 +103,10 @@ void animate() {
 
     previous_timestamp = timestamp;
 
-    if (frogger.circle.pos.y < 0.0) {
+    if (frogger.sphere.pos.y < 0.0) {
         mode.jumping = false;
-        frogger.circle.pos.y = 0.0;
-        frogger.launch_location = frogger.circle.pos;
+        frogger.sphere.pos.y = 0.0;
+        frogger.launch_location = frogger.sphere.pos;
         previous_timestamp = -1.0;
     }
 
@@ -209,14 +209,14 @@ void keyboard(unsigned char key, int x, int y) {
 
 void update_frog_state_analytical(double time) {
     velocity_cartesian v = polar_to_cartesian(frogger.launch_velocity);
-    frogger.circle.pos.x = v.x * time + frogger.launch_location.x;
-    frogger.circle.pos.y = 0.5 * gravity * pow(time, 2) + v.y * time
+    frogger.sphere.pos.x = v.x * time + frogger.launch_location.x;
+    frogger.sphere.pos.y = 0.5 * gravity * pow(time, 2) + v.y * time
                            + frogger.launch_location.y;
 }
 
 void update_frog_state_numerical(double dt) {
-    frogger.circle.pos.x += frogger.velocity.x * dt;
-    frogger.circle.pos.y += frogger.velocity.y * dt;
+    frogger.sphere.pos.x += frogger.velocity.x * dt;
+    frogger.sphere.pos.y += frogger.velocity.y * dt;
     frogger.velocity.y += gravity * dt;
 }
 
@@ -278,16 +278,16 @@ void draw_axes(double length) {
 
 void build_sphere_parametric(double phi, double step_phi) {
     int slices = mode.segments;
-    double r = frogger.circle.radius;
+    double r = frogger.sphere.radius;
 
     for (int i = 0; i <= slices; i++) {
         double theta = i / (float)slices * 2.0 * M_PI;
-        double x1 = frogger.circle.pos.x + r * sin(phi) * cos(theta);
-        double y1 = frogger.circle.pos.y + r * sin(phi) * sin(theta);
-        double z1 = r * cos(phi);
-        double x2 = frogger.circle.pos.x + r * sin(phi + step_phi) * cos(theta);
-        double y2 = frogger.circle.pos.y + r * sin(phi + step_phi) * sin(theta);
-        double z2 = r * cos(phi + step_phi);
+        double x1 = frogger.sphere.pos.x + r * sin(phi) * cos(theta);
+        double y1 = frogger.sphere.pos.y + r * sin(phi) * sin(theta);
+        double z1 = frogger.sphere.pos.z + r * cos(phi);
+        double x2 = frogger.sphere.pos.x + r * sin(phi + step_phi) * cos(theta);
+        double y2 = frogger.sphere.pos.y + r * sin(phi + step_phi) * sin(theta);
+        double z2 = frogger.sphere.pos.z + r * cos(phi + step_phi);
         glVertex3d(x1, y1, z1);
         glVertex3d(x2, y2, z2);
     }
@@ -316,16 +316,18 @@ void build_circle_extras(bool tangents, bool normals) {
     double step = (2 * M_PI) / mode.segments;
     for (int i = 0; i < mode.segments; i++) {
         double theta = i * step;
-        double x = frogger.circle.radius * cos(theta);
-        double y = frogger.circle.radius * sin(theta);
-        vector2d start = {frogger.circle.pos.x + x, frogger.circle.pos.y + y};
+        double x = frogger.sphere.radius * cos(theta);
+        double y = frogger.sphere.radius * sin(theta);
+        double z = 0.0;
+        vector3d start = {frogger.sphere.pos.x + x, frogger.sphere.pos.y + y,
+        frogger.sphere.pos.z + z};
 
         if (tangents) {
-            vector2d tangent = {-y, x};
+            vector3d tangent = {-y, x, z};
             build_vector(start, tangent, 0.1, cyan);
         }
         if (normals) {
-            vector2d normal = {x, y};
+            vector3d normal = {x, y, z};
             build_vector(start, normal, 0.1, yellow);
         }
     }
@@ -343,33 +345,36 @@ void build_parabola_extras(bool tangents, bool normals) {
 
         double vx = v0.x;
         double vy = v0.y + gravity * t;
+        double vz = 0.0;
 
         double x = frogger.launch_velocity.speed * t
                    * cos(frogger.launch_velocity.angle);
         double y = frogger.launch_velocity.speed * t
                    * sin(frogger.launch_velocity.angle)
                    + 0.5 * gravity * t * t;
+        double z = 0.0;
 
-        vector2d start = {frogger.launch_location.x + x , y};
+        vector3d start = {frogger.launch_location.x + x , y, z};
 
         if (tangents) {
-            vector2d tangent = {vx, vy};
+            vector3d tangent = {vx, vy, vz};
             build_vector(start, tangent, 0.1, cyan);
         }
         if (normals) {
-            vector2d normal = {-vy, vx};
+            vector3d normal = {-vy, vx, vz};
             build_vector(start, normal, 0.1, yellow);
         }
     }
 }
 
-void build_vector(vector2d p, vector2d q, double scale, const double *color) {
-    double magnitude = sqrt(q.x * q.x + q.y * q.y);
+void build_vector(vector3d p, vector3d q, double scale, const double *color) {
+    double magnitude = sqrt( pow(q.x,2) * pow(q.y,2) + pow(q.z,2) );
     double x = (q.x / magnitude) * scale;
     double y = (q.y / magnitude) * scale;
+    double z = (q.z / magnitude) * scale;
 
-    double start[] = {p.x, p.y, 0.0};
-    double end[] = {p.x + x, p.y + y, 0.0};
+    double start[] = {p.x, p.y, p.z};
+    double end[] = {p.x + x, p.y + y, p.z + z};
     build_line(start, end, color);
 }
 

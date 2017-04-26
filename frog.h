@@ -1,14 +1,14 @@
 #ifndef A1_FROG
 #define A1_FROG
 
-#include "circle.h"
+#include "sphere.h"
 #include "vectors.h"
 
 typedef struct {
-    circle circle;
+    sphere sphere;
     velocity_cartesian velocity;
     velocity_polar launch_velocity;
-    vector2d launch_location;
+    vector3d launch_location;
 } frog;
 
 #endif

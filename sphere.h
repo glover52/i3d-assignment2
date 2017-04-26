@@ -1,11 +1,11 @@
-#ifndef A1_CIRCLE
-#define A1_CIRCLE
+#ifndef A2_SPHERE
+#define A2_SPHERE
 
 #include "vectors.h"
 
 typedef struct {
-    vector2d pos;
+    vector3d pos;
     const double radius;
-} circle;
+} sphere;
 
 #endif

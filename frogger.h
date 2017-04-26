@@ -45,7 +45,7 @@ void draw_extras(bool tangents, bool normals);
 
 void build_line(const double *p, const double *q, const double *color);
 
-void build_vector(vector2d p, vector2d q, double scale, const double *color);
+void build_vector(vector3d p, vector3d q, double scale, const double *color);
 
 void build_sphere_parametric(double, double);
 
