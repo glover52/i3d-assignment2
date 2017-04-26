@@ -4,21 +4,30 @@
 #include <stdbool.h>
 #include "frog.h"
 
+#define W_NAME "COSC1187 Assignment 2 - Frogger"
+#define W_WIDTH 640
+#define W_HEIGHT 480
+#define W_DEFAULT 10
+
 // Handle GLUT events
 
 void display(void);
 
 void animate(void);
 
+void mouseMotion(int, int);
+
+void mouseState(int, int, int, int);
+
 void keyboard(unsigned char, int, int);
 
-void special_input(int key, int x, int y);
+void specialKeyboard(int, int, int);
 
 // Animation
 
 void update_frog_state_analytical(double);
 
-void update_frog_state_numerical(double t);
+void update_frog_state_numerical(double);
 
 // Open a GL context to draw objects
 

@@ -37,16 +37,24 @@ settings mode = {.segments=8 };
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
-    glutCreateWindow("Frogger");
+    glutInitWindowSize(W_WIDTH, W_HEIGHT);
+    glutInitWindowPosition(W_DEFAULT, W_DEFAULT);
+    glutCreateWindow(W_NAME);
 
     glMatrixMode(GL_PROJECTION);
     glOrtho(-1.0, 1.0, -1.0, 1.0, -1.0, 1.0);
     glMatrixMode(GL_MODELVIEW);
 
+    // Mouse commands
+    glutMotionFunc(mouseMotion);
+    glutMouseFunc(mouseState);
+
+    // Keyboard commands
+    glutKeyboardFunc(keyboard);
+    glutSpecialFunc(specialKeyboard);
+
     glutDisplayFunc(display);
     glutIdleFunc(animate);
-    glutKeyboardFunc(keyboard);
-    glutSpecialFunc(special_input);
 
     glutMainLoop();
 
@@ -101,7 +109,18 @@ void animate() {
     glutPostRedisplay();
 }
 
-void special_input(int key, int x, int y) {
+void mouseMotion(int x, int y)
+{
+    // Called when left or right mouse button pressed AND mouse moved
+}
+
+void mouseState(int button, int state, int x, int y)
+{
+    // Button: GLUT_LEFT_BUTTON && GLUT_RIGHT_BUTTON
+    // State: GLUT_DOWN && GLUT_UP
+}
+
+void specialKeyboard(int key, int x, int y) {
     switch (key) {
         case GLUT_KEY_UP:
             if (mode.segments < INT_MAX / 2) {
@@ -174,7 +193,7 @@ void keyboard(unsigned char key, int x, int y) {
 void update_frog_state_analytical(double time) {
     velocity_cartesian v = polar_to_cartesian(frogger.launch_velocity);
     frogger.circle.pos.x = v.x * time + frogger.launch_location.x;
-    frogger.circle.pos.y = 1.0 / 2.0 * gravity * pow(time, 2) + v.y * time
+    frogger.circle.pos.y = 0.5 * gravity * pow(time, 2) + v.y * time
                            + frogger.launch_location.y;
 }
 
@@ -248,7 +267,7 @@ void build_parabola_parametric(void) {
                    * cos(frogger.launch_velocity.angle);
         double y = frogger.launch_velocity.speed * t
                    * sin(frogger.launch_velocity.angle)
-                   + (1.0 / 2.0) * gravity * t * t;
+                   + 0.5f * gravity * t * t;
         glVertex2d(x + frogger.launch_location.x, y);
     }
 }
@@ -289,7 +308,7 @@ void build_parabola_extras(bool tangents, bool normals) {
                    * cos(frogger.launch_velocity.angle);
         double y = frogger.launch_velocity.speed * t
                    * sin(frogger.launch_velocity.angle)
-                   + (1.0 / 2.0) * gravity * t * t;
+                   + 0.5 * gravity * t * t;
 
         vector2d start = {frogger.launch_location.x + x , y};
 
