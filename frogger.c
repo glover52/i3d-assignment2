@@ -65,6 +65,9 @@ int main(int argc, char **argv) {
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
+    glLoadIdentity();
+
+
 
     draw_circle();
     draw_parabola();
@@ -76,9 +79,8 @@ void display() {
 }
 
 void animate() {
-    if (!mode.jumping){
+    if (!mode.jumping)
         return;
-    }
 
     static double previous_timestamp = -1.0;
     double timestamp = (glutGet(GLUT_ELAPSED_TIME) / millis_per_sec)
@@ -91,11 +93,11 @@ void animate() {
 
     double delta_time = timestamp - previous_timestamp;
 
-    if (mode.analytical) {
+    if (mode.analytical)
         update_frog_state_analytical(timestamp);
-    } else {
+
+    else
         update_frog_state_numerical(delta_time);
-    }
 
     previous_timestamp = timestamp;
 
@@ -112,6 +114,7 @@ void animate() {
 void mouseMotion(int x, int y)
 {
     // Called when left or right mouse button pressed AND mouse moved
+
 }
 
 void mouseState(int button, int state, int x, int y)
@@ -123,14 +126,12 @@ void mouseState(int button, int state, int x, int y)
 void specialKeyboard(int key, int x, int y) {
     switch (key) {
         case GLUT_KEY_UP:
-            if (mode.segments < INT_MAX / 2) {
+            if (mode.segments < INT_MAX / 2)
                 mode.segments *= 2;
-            }
             break;
         case GLUT_KEY_DOWN:
-            if (mode.segments > 2) {
+            if (mode.segments > 2)
                 mode.segments /= 2;
-            }
             break;
         default:
             break;
@@ -225,9 +226,9 @@ void draw_velocity() {
 }
 
 void draw_extras(bool tangents, bool normals) {
-    if (!tangents && !normals) {
+    if (!tangents && !normals)
         return;
-    }
+
     glBegin(GL_LINES);
     build_circle_extras(tangents, normals);
     build_parabola_extras(tangents, normals);
@@ -263,12 +264,15 @@ void build_parabola_parametric(void) {
 
     for (int i = 0; i <= mode.segments; i++) {
         double t = i * step;
+
         double x = frogger.launch_velocity.speed * t
                    * cos(frogger.launch_velocity.angle);
+
         double y = frogger.launch_velocity.speed * t
                    * sin(frogger.launch_velocity.angle)
                    + 0.5f * gravity * t * t;
-        glVertex2d(x + frogger.launch_location.x, y);
+
+        glVertex3d(x + frogger.launch_location.x, y, 0);
     }
 }
 
