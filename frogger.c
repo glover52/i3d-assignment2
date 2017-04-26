@@ -66,7 +66,10 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
-    draw_circle();
+//    glRotated(0.5, 0.0, 1.0, 0);
+//    glutPostRedisplay();
+
+    draw_sphere();
     draw_parabola();
     draw_velocity();
     draw_extras(mode.tangents, mode.normals);
@@ -203,11 +206,16 @@ void update_frog_state_numerical(double dt) {
     frogger.velocity.y += gravity * dt;
 }
 
-void draw_circle() {
-    glBegin(GL_LINE_LOOP);
-    glColor3dv(yellow);
-    build_circle_parametric();
-    glEnd();
+void draw_sphere() {
+    double step_phi = M_PI / mode.segments;
+
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    for (int j = 0; j <= mode.segments; j++) {
+        double phi = j / (double)mode.segments * M_PI;
+        glBegin(GL_QUAD_STRIP);
+        build_sphere_parametric(phi, step_phi);
+        glEnd();
+    }
 }
 
 void draw_parabola() {
@@ -246,13 +254,20 @@ void draw_axes(double length) {
     glEnd();
 }
 
-void build_circle_parametric() {
-    double step = (2 * M_PI) / mode.segments;
-    for (int i = 0; i < mode.segments; i++) {
-        double theta = i * step;
-        double x = frogger.circle.pos.x + frogger.circle.radius * cos(theta);
-        double y = frogger.circle.pos.y + frogger.circle.radius * sin(theta);
-        glVertex2d(x, y);
+void build_sphere_parametric(double phi, double step_phi) {
+    int slices = mode.segments;
+    double r = frogger.circle.radius;
+
+    for (int i = 0; i <= slices; i++) {
+        double theta = i / (float)slices * 2.0 * M_PI;
+        double x1 = frogger.circle.pos.x + r * sin(phi) * cos(theta);
+        double y1 = frogger.circle.pos.y + r * sin(phi) * sin(theta);
+        double z1 = r * cos(phi);
+        double x2 = frogger.circle.pos.x + r * sin(phi + step_phi) * cos(theta);
+        double y2 = frogger.circle.pos.y + r * sin(phi + step_phi) * sin(theta);
+        double z2 = r * cos(phi + step_phi);
+        glVertex3d(x1, y1, z1);
+        glVertex3d(x2, y2, z2);
     }
 }
 
