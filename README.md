@@ -8,7 +8,7 @@ Interactive 3D Graphics and Animation
 
 ### Checklist
 
-- [ ] Draw a sphere to represent a frog using parametric equations.
+- [x] Draw a sphere to represent a frog using parametric equations.
 - [ ] Draw the parabola using parametric equations (but now in three dimensions).
 - [ ] Control the x and z direction of the frog (ie, rotation around the y axis).
 - [ ] Control the speed/rotation of the frog’s jump (as per assignment 1).
