@@ -1,8 +1,31 @@
 #ifndef A1_FROGGER
 #define A1_FROGGER
 
-#include <stdbool.h>
+#if _WIN32
+#   include <Windows.h>
+#endif
+
+#if __APPLE__
+#   include <OpenGL/gl.h>
+#   include <OpenGL/glu.h>
+#   include <GLUT/glut.h>
+#else
+#   include <GL/gl.h>
+#   include <GL/glu.h>
+#   include <GL/glut.h>
+#endif
+
+#include <stdio.h>
+#include <stdlib.h>
+#include <math.h>
+#include <limits.h>
+#include <float.h>
+
+#include "invariants.h"
+#include "vectors.h"
 #include "frog.h"
+#include "colours.h"
+#include "settings.h"
 
 #define W_NAME "COSC1187 Assignment 2 - Frogger"
 #define W_WIDTH 640

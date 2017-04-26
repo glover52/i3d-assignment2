@@ -1,30 +1,3 @@
-#if _WIN32
-#   include <Windows.h>
-#endif
-#if __APPLE__
-
-#   include <OpenGL/gl.h>
-#   include <OpenGL/glu.h>
-#   include <GLUT/glut.h>
-
-#else
-#   include <GL/gl.h>
-#   include <GL/glu.h>
-#   include <GL/glut.h>
-#endif
-
-#include <stdio.h>
-#include <stdlib.h>
-#include <math.h>
-#include <stdbool.h>
-#include <limits.h>
-#include <float.h>
-
-#include "invariants.h"
-#include "vectors.h"
-#include "frog.h"
-#include "colours.h"
-#include "settings.h"
 #include "frogger.h"
 
 
