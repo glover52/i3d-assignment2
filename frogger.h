@@ -24,9 +24,9 @@ void update_frog_state_numerical(double t);
 
 void draw_axes(double);
 
-void draw_circle(bool cartesian);
+void draw_circle();
 
-void draw_parabola(bool cartesian);
+void draw_parabola();
 
 void draw_velocity(void);
 
@@ -38,11 +38,7 @@ void build_line(const double *p, const double *q, const double *color);
 
 void build_vector(vector2d p, vector2d q, double scale, const double *color);
 
-void build_circle_cartesian(void);
-
 void build_circle_parametric(void);
-
-void build_parabola_cartesian(void);
 
 void build_parabola_parametric(void);
 

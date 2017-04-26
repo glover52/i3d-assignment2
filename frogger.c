@@ -58,8 +58,8 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
 
-    draw_circle(mode.cartesian);
-    draw_parabola(mode.cartesian);
+    draw_circle();
+    draw_parabola();
     draw_velocity();
     draw_extras(mode.tangents, mode.normals);
     draw_axes(1.0f);
@@ -148,7 +148,6 @@ void keyboard(unsigned char key, int x, int y) {
             mode.normals = !mode.normals;
             break;
         case 'f':
-            mode.cartesian = !mode.cartesian;
             break;
         case 'i':
             if (!mode.jumping) {
@@ -185,26 +184,17 @@ void update_frog_state_numerical(double dt) {
     frogger.velocity.y += gravity * dt;
 }
 
-void draw_circle(bool cartesian) {
+void draw_circle() {
     glBegin(GL_LINE_LOOP);
-    if (cartesian) {
-        glColor3dv(white);
-        build_circle_cartesian();
-    } else {
-        glColor3dv(yellow);
-        build_circle_parametric();
-    }
+    glColor3dv(yellow);
+    build_circle_parametric();
     glEnd();
 }
 
-void draw_parabola(bool cartesian) {
+void draw_parabola() {
     glBegin(GL_LINE_STRIP);
     glColor3dv(blue);
-    if (cartesian) {
-        build_parabola_cartesian();
-    } else {
-        build_parabola_parametric();
-    }
+    build_parabola_parametric();
     glEnd();
 }
 
@@ -237,27 +227,6 @@ void draw_axes(double length) {
     glEnd();
 }
 
-void build_circle_cartesian() {
-    int half_circle = mode.segments / 2;
-    double step = 2 * frogger.circle.radius / half_circle;
-
-    for (int i = -half_circle; i <= half_circle; i++) {
-        double sign = (i > 0) - (i < 0);
-        double x = frogger.circle.pos.x + sign * i * step
-                   - frogger.circle.radius;
-
-        double discriminant = pow(frogger.circle.radius, 2)
-                              - pow(x - frogger.circle.pos.x, 2);
-        double y = frogger.circle.pos.y;
-
-        if (discriminant > 0.0) {
-            y += sign * sqrt(discriminant);
-        }
-
-        glVertex2d(x, y);
-    }
-}
-
 void build_circle_parametric() {
     double step = (2 * M_PI) / mode.segments;
     for (int i = 0; i < mode.segments; i++) {
@@ -265,24 +234,6 @@ void build_circle_parametric() {
         double x = frogger.circle.pos.x + frogger.circle.radius * cos(theta);
         double y = frogger.circle.pos.y + frogger.circle.radius * sin(theta);
         glVertex2d(x, y);
-    }
-}
-
-void build_parabola_cartesian(void) {
-    double distance = -(2 * frogger.launch_velocity.speed
-                        * frogger.launch_velocity.speed
-                        * sin(frogger.launch_velocity.angle)
-                        * cos(frogger.launch_velocity.angle)) / gravity;
-
-    double step = distance / mode.segments;
-
-    for (int i = 0; i <= mode.segments; i++) {
-        double x = i * step;
-        double y = tan(frogger.launch_velocity.angle) * x
-                   + (gravity / (2 * pow(frogger.launch_velocity.speed, 2)
-                   * pow(cos(frogger.launch_velocity.angle),2))) * pow(x, 2);
-
-        glVertex2d(x + frogger.launch_location.x, y);
     }
 }
 
