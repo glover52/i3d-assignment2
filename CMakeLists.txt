@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.6)
 project(a1)
 
-set(CMAKE_C_COMPILER clang)
+set(CMAKE_C_COMPILER gcc)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_FLAGS "-Wall -pedantic -Wno-deprecated-declarations")
 
