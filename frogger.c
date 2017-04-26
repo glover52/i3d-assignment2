@@ -208,7 +208,7 @@ void draw_sphere() {
 void draw_parabola() {
     glPushAttrib(GL_CURRENT_BIT);
     glBegin(GL_LINE_STRIP);
-    glColor3dv(blue);
+    glColor3dv(yellow);
     build_parabola_parametric();
     glEnd();
     glPopAttrib();
