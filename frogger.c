@@ -13,6 +13,7 @@
 #   include <GL/glut.h>
 #endif
 
+#include <stdio.h>
 #include <stdlib.h>
 #include <math.h>
 #include <stdbool.h>
@@ -66,8 +67,6 @@ void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
     glLoadIdentity();
-
-
 
 //    glRotated(0.5, 0.0, 1.0, 0);
 //    glutPostRedisplay();
@@ -166,6 +165,7 @@ void keyboard(unsigned char key, int x, int y) {
             break;
         case 't':
             mode.tangents = !mode.tangents;
+            printf("");
             break;
         case 'n':
             mode.normals = !mode.normals;
@@ -189,8 +189,21 @@ void keyboard(unsigned char key, int x, int y) {
         case 'q':
             exit(EXIT_SUCCESS);
         default:
-            break;
+            printf("=== CONTROLS ===\n");
+            printf("\'w\': increase speed\n");
+            printf("\'s\': decrease speed\n");
+            printf("\'a\': increase angle\n");
+            printf("\'d\': decrease angle\n");
+            printf("\'t\': toggle tangent visuals\n");
+            printf("\'n\': toggle normal visuals\n");
+            printf("\'f\': none\n");
+            printf("\'i\': toggle between integrations\n");
+            printf("\'up\': double segment amoutn\n");
+            printf("\'down\': half segment amoutn\n");
+            printf("\'space\': jump!\n\n");
     }
+
+    // Request a new frame
     glutPostRedisplay();
 }
 
@@ -220,27 +233,33 @@ void draw_sphere() {
 }
 
 void draw_parabola() {
+    glPushAttrib(GL_CURRENT_BIT);
     glBegin(GL_LINE_STRIP);
     glColor3dv(blue);
     build_parabola_parametric();
     glEnd();
+    glPopAttrib();
 }
 
 void draw_velocity() {
+    glPushAttrib(GL_CURRENT_BIT);
     glBegin(GL_LINES);
     velocity_cartesian v = polar_to_cartesian(frogger.launch_velocity);
     build_vector(frogger.launch_location, v, 0.2, magenta);
     glEnd();
+    glPopAttrib();
 }
 
 void draw_extras(bool tangents, bool normals) {
     if (!tangents && !normals)
         return;
 
+    glPushAttrib(GL_CURRENT_BIT);
     glBegin(GL_LINES);
     build_circle_extras(tangents, normals);
     build_parabola_extras(tangents, normals);
     glEnd();
+    glPopAttrib();
 }
 
 void draw_axes(double length) {
@@ -248,11 +267,13 @@ void draw_axes(double length) {
     double y_axis[] = {0.0, length, 0.0};
     double z_axis[] = {0.0, 0.0, length};
 
+    glPushAttrib(GL_CURRENT_BIT);
     glBegin(GL_LINES);
     build_line(origin, x_axis, red);
     build_line(origin, y_axis, green);
     build_line(origin, z_axis, blue);
     glEnd();
+    glPopAttrib();
 }
 
 void build_sphere_parametric(double phi, double step_phi) {
