@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall --pedantic -Wno-deprecated-declarations -std=c11
-LIBS= -lGL -lGLU -lglut
+LIBS=-lm -lGL -lGLU -lglut
 
 # Windows (cygwin)
 ifeq ($(OS), "Windows_NT")
