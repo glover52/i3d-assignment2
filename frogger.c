@@ -1,4 +1,5 @@
 #include "frogger.h"
+#include "settings.h"
 
 
 frog frogger = {
@@ -138,25 +139,28 @@ void keyboard(unsigned char key, int x, int y) {
             break;
         case 't':
             mode.tangents = !mode.tangents;
-            printf("");
+            printf("Tangents: %d\n", mode.tangents);
             break;
         case 'n':
             mode.normals = !mode.normals;
+            printf("Normals: %d\n", mode.normals);
             break;
         case 'f':
             break;
         case 'i':
-            if (!mode.jumping) {
-                mode.analytical = !mode.analytical;
+            if (mode.jumping)
                 break;
-            }
+            mode.analytical = !mode.analytical;
+            printf("Analytical: %d\n", mode.analytical);
+            break;
         case ' ':
-            if (!mode.jumping) {
-                frogger.velocity = polar_to_cartesian(frogger.launch_velocity);
-                mode.jump_start_timestamp = glutGet(GLUT_ELAPSED_TIME)
-                                            / millis_per_sec;
-                mode.jumping = true;
-            }
+            if (mode.jumping)
+                break;
+            frogger.velocity = polar_to_cartesian(frogger.launch_velocity);
+            mode.jump_start_timestamp = glutGet(GLUT_ELAPSED_TIME)
+                                        / millis_per_sec;
+            mode.jumping = true;
+            printf("JUMPING!\n");
             break;
         case 27: // [ESC]
         case 'q':
