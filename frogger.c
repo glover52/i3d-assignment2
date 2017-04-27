@@ -95,7 +95,7 @@ void animate() {
 void mouseMotion(int x, int y)
 {
     // Called when left or right mouse button pressed AND mouse moved
-//    camera.rotX = (float) (camera.lastX + x);
+    camera.rotX = (float) (camera.lastX + x);
     camera.rotY = (float) (camera.lastY + y);
 }
 
@@ -119,13 +119,9 @@ void mouseState(int button, int state, int x, int y)
 
 void specialKeyboard(int key, int x, int y) {
     switch (key) {
-        case GLUT_KEY_UP:
-            if (mode.segments < INT_MAX / 2)
-                mode.segments *= 2;
+        case GLUT_KEY_LEFT:
             break;
-        case GLUT_KEY_DOWN:
-            if (mode.segments > 2)
-                mode.segments /= 2;
+        case GLUT_KEY_RIGHT:
             break;
         default:
             break;
@@ -136,40 +132,44 @@ void specialKeyboard(int key, int x, int y) {
 
 void keyboard(unsigned char key, int x, int y) {
     switch (key) {
+        /* Toggle axes (should also draw an axes at local origin of every mesh being rendered) */
+        case 'o':
+            break;
+
+        /* Toggle normals (this should also toggle the tangents for the parabola) */
+        case 'n':
+            mode.normals = !mode.normals;
+            mode.tangents = !mode.tangents;
+            printf("Normals: %d, Tangents: %d\n", mode.normals, mode.tangents);
+            break;
+
+        /* Toggle wire-frame */
+        case 'p':
+            break;
+
+        /* Toggle lighting */
+        case 'l':
+            break;
+
+        /* Toggle textures */
+        case 't':
+            break;
+
         case 'w':
-            if (frogger.launch_velocity.speed < DBL_MAX) {
+            if (frogger.launch_velocity.speed < DBL_MAX)
                 frogger.launch_velocity.speed += 0.1;
-            }
             break;
         case 's':
-            if (frogger.launch_velocity.speed > 0.1) {
+            if (frogger.launch_velocity.speed > 0.1)
                 frogger.launch_velocity.speed -= 0.1;
-            };
             break;
         case 'a':
             if (frogger.launch_velocity.angle < 2)
                 frogger.launch_velocity.angle += 0.1;
             break;
         case 'd':
-            if (frogger.launch_velocity.angle > 0.1) {
+            if (frogger.launch_velocity.angle > 0.1)
                 frogger.launch_velocity.angle -= 0.1;
-            }
-            break;
-        case 't':
-            mode.tangents = !mode.tangents;
-            printf("Tangents: %d\n", mode.tangents);
-            break;
-        case 'n':
-            mode.normals = !mode.normals;
-            printf("Normals: %d\n", mode.normals);
-            break;
-        case 'f':
-            break;
-        case 'i':
-            if (mode.jumping)
-                break;
-            mode.analytical = !mode.analytical;
-            printf("Analytical: %d\n", mode.analytical);
             break;
         case ' ':
             if (mode.jumping)
@@ -179,22 +179,48 @@ void keyboard(unsigned char key, int x, int y) {
                                         / millis_per_sec;
             mode.jumping = true;
             break;
+
+        /* Increase/Decrease amount of segments */
+        case '+':
+        case '=':
+            if (mode.segments < 64)
+                mode.segments *= 2;
+            break;
+        case '-':
+        case '_':
+            if (mode.segments > 4)
+                mode.segments /= 2;
+            break;
+
+        /* Toggle between integrations (deprecated) */
+        case 'i':
+            if (mode.jumping)
+                break;
+            mode.analytical = !mode.analytical;
+            printf("Analytical: %d\n", mode.analytical);
+            break;
+
+        /* Exit the program */
         case 27: // [ESC]
         case 'q':
             exit(EXIT_SUCCESS);
         default:
             printf("=== CONTROLS ===\n");
+            printf("\'o\': toggle axes\n");
+            printf("\'n\': toggle normals\n");
+            printf("\'p\': toggle wireframe\n");
+            printf("\'l\': toggle lighting\n");
+            printf("\'t\': toggle textures\n");
             printf("\'w\': increase speed\n");
             printf("\'s\': decrease speed\n");
             printf("\'a\': increase angle\n");
             printf("\'d\': decrease angle\n");
-            printf("\'t\': toggle tangent visuals\n");
-            printf("\'n\': toggle normal visuals\n");
-            printf("\'f\': none\n");
-            printf("\'i\': toggle between integrations\n");
-            printf("\'up\': double segment amoutn\n");
-            printf("\'down\': half segment amoutn\n");
-            printf("\'space\': jump!\n\n");
+            printf("\'space\': jump\n");
+            printf("\'left mouse\': rotate camera\n");
+            printf("\'right mouse\': zoom camera\n");
+            printf("\'left arrow\': rotate frog left\n");
+            printf("\'right arrow\': rotate frog right\n");
+            printf("\'+/-\': double/halve segment amount\n");
     }
 
     // Request a new frame
@@ -202,6 +228,7 @@ void keyboard(unsigned char key, int x, int y) {
 }
 
 void update_frog_state_analytical(double time) {
+    /* Analytical integration NOT required */
     velocity_cartesian v = polar_to_cartesian(frogger.launch_velocity);
     frogger.sphere.pos.x = v.x * time + frogger.launch_location.x;
     frogger.sphere.pos.y = 0.5 * gravity * pow(time, 2) + v.y * time
@@ -214,8 +241,10 @@ void update_frog_state_analytical(double time) {
 }
 
 void update_frog_state_numerical(double dt) {
+    /* NUMERICAL INTEGRATION REQUIRED */
     frogger.sphere.pos.x += frogger.velocity.x * dt;
     frogger.sphere.pos.y += frogger.velocity.y * dt;
+    frogger.sphere.pos.z += frogger.velocity.z * dt;
     frogger.velocity.y += gravity * dt;
 
     // Modify camera variables to make camera follow frog
@@ -227,17 +256,17 @@ void update_frog_state_numerical(double dt) {
 void camera_movement() {
     glLoadIdentity();
 
+    // Rotate camera using the X rotation
+    glRotated(camera.rotX, 1, 0, 0);
+
+    // Rotate camera using the Y rotation
+    glRotated(camera.rotY, 0, 1, 0);
+
     // Make the camera move with the sphere
     glTranslated(camera.pos.x, camera.pos.y, camera.pos.z);
 
     // Zoom by translating along the Z axis
     //glTranslated(0, 0, camera.zoom);
-
-    // Rotate camera using the X rotation
-//    glRotated(camera.rotX, 1, 0, 0);
-
-    // Rotate camera using the Y rotation
-    glRotated(camera.rotY, 0, 1, 0);
 
     // Request a new frame
     glutPostRedisplay();
@@ -250,7 +279,7 @@ void draw_sphere() {
     for (int j = 0; j <= mode.segments; j++) {
         double phi = j / (double)mode.segments * M_PI;
         glBegin(GL_QUAD_STRIP);
-        build_sphere_parametric(phi, step_phi);
+        build_sphere(phi, step_phi);
         glEnd();
     }
 }
@@ -259,7 +288,7 @@ void draw_parabola() {
     glPushAttrib(GL_CURRENT_BIT);
     glBegin(GL_LINE_STRIP);
     glColor3dv(yellow);
-    build_parabola_parametric();
+    build_parabola();
     glEnd();
     glPopAttrib();
 }
@@ -299,7 +328,7 @@ void draw_axes(double length) {
     glPopAttrib();
 }
 
-void build_sphere_parametric(double phi, double step_phi) {
+void build_sphere(double phi, double step_phi) {
     int slices = mode.segments;
     double r = frogger.sphere.radius;
 
@@ -316,7 +345,7 @@ void build_sphere_parametric(double phi, double step_phi) {
     }
 }
 
-void build_parabola_parametric(void) {
+void build_parabola(void) {
     double distance = (-1.0 / gravity) * 2 * frogger.launch_velocity.speed
                       * sin(frogger.launch_velocity.angle);
     double step = distance / mode.segments;

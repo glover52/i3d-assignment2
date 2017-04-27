@@ -72,9 +72,9 @@ void build_line(const double *p, const double *q, const double *color);
 
 void build_vector(Vector3d p, Vector3d q, double scale, const double *color);
 
-void build_sphere_parametric(double, double);
+void build_sphere(double, double);
 
-void build_parabola_parametric(void);
+void build_parabola(void);
 
 void build_circle_extras(bool tangents, bool normals);
 
