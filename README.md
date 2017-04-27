@@ -7,6 +7,9 @@ Interactive 3D Graphics and Animation
 -------------------------------------
 
 ### Checklist
+"[ ]" = Not Started
+"[-]" = Started
+"[X]" = Completed
 
 - [x] Draw a sphere to represent a frog using parametric equations.
 - [ ] Draw the parabola using parametric equations (but now in three dimensions).
@@ -14,7 +17,7 @@ Interactive 3D Graphics and Animation
 - [ ] Control the speed/rotation of the frog’s jump (as per assignment 1).
 - [ ] Animate the frog using the numerical integration technique from assignment 1, but now in three dimensions. No analytical integration required.
 - [-] Use a third person perspective camera, that follows the frog as it moves.
-- [ ] Draw a simple world (just a grid on the xz plane for now).
+- [-] Draw a simple world (just a grid on the xz plane for now).
 - [ ] Draw moving cylinders to represent logs, and moving cubes to represent cars.
 - [ ] Draw normal vectors for all geometry being rendered (only tangents for the parabola however).
 - [ ] Apply lighting to all geometry.
