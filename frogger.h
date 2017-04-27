@@ -56,6 +56,8 @@ void update_frog_state_numerical(double);
 
 void camera_movement();
 
+void draw_grid(int);
+
 void draw_axes(double);
 
 void draw_sphere();
@@ -67,6 +69,8 @@ void draw_velocity(void);
 void draw_extras(bool tangents, bool normals);
 
 // Build up the required vertexes within the GL context
+
+void build_grid(int, int);
 
 void build_line(const double *p, const double *q, const double *color);
 

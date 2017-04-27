@@ -49,7 +49,7 @@ void display() {
 //    glutPostRedisplay();
 
     camera_movement();
-
+    draw_grid(8);
     draw_sphere();
     draw_parabola();
     draw_velocity();
@@ -257,10 +257,10 @@ void camera_movement() {
     glLoadIdentity();
 
     // Rotate camera using the X rotation
-    glRotated(camera.rotX, 1, 0, 0);
+    glRotated(camera.rotX, 0, 1, 0);
 
     // Rotate camera using the Y rotation
-    glRotated(camera.rotY, 0, 1, 0);
+    glRotated(camera.rotY, 1, 0, 0);
 
     // Make the camera move with the sphere
     glTranslated(camera.pos.x, camera.pos.y, camera.pos.z);
@@ -272,16 +272,34 @@ void camera_movement() {
     glutPostRedisplay();
 }
 
+void draw_grid(int n) {
+    glPushAttrib(GL_CURRENT_BIT);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+    for (int j = 0; j < n; j++) {
+        glBegin(GL_QUAD_STRIP);
+        glColor3dv(green);
+        build_grid(n, j);
+        glEnd();
+    }
+
+    glPopAttrib();
+}
+
 void draw_sphere() {
+    glPushAttrib(GL_CURRENT_BIT);
     double step_phi = M_PI / mode.segments;
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     for (int j = 0; j <= mode.segments; j++) {
         double phi = j / (double)mode.segments * M_PI;
         glBegin(GL_QUAD_STRIP);
+        glColor3dv(white);
         build_sphere(phi, step_phi);
         glEnd();
     }
+
+    glPopAttrib();
 }
 
 void draw_parabola() {
@@ -326,6 +344,21 @@ void draw_axes(double length) {
     build_line(origin, z_axis, blue);
     glEnd();
     glPopAttrib();
+}
+
+void build_grid(int n, int j) {
+    double x, z, xStep, zStep;
+    xStep = pow(n, -1) * 2.0;
+    zStep = pow(n, -1) * 2.0; // xStep and zStep are the same, but could be different
+
+    for (int i = 0; i <= n; i++) {
+        x = -1.0 + i * xStep;
+        z = -1.0 + j * zStep;
+
+        glVertex3d(x, 0, z);
+        // Replace this comment with calculation to work out next z value
+        glVertex3d(x, 0, z + 0.25f);
+    }
 }
 
 void build_sphere(double phi, double step_phi) {
