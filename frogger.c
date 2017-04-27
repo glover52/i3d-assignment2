@@ -1,13 +1,16 @@
 #include "frogger.h"
 #include "settings.h"
+#include "camera.h"
 
 
-frog frogger = {
+Frog frogger = {
         .sphere={.radius=0.05},
         .launch_velocity={1.0, 1.0}
 };
 
-settings mode = {.segments=8 };
+Settings mode = {.segments=8 };
+
+Camera camera;
 
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
@@ -40,10 +43,11 @@ int main(int argc, char **argv) {
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
-//    glLoadIdentity();
 
-    glRotated(0.5, 0.0, 1.0, 0);
-    glutPostRedisplay();
+//    glRotated(0.5, 0.0, 1.0, 0);
+//    glutPostRedisplay();
+
+    camera_movement();
 
     draw_sphere();
     draw_parabola();
@@ -90,13 +94,26 @@ void animate() {
 void mouseMotion(int x, int y)
 {
     // Called when left or right mouse button pressed AND mouse moved
-
+//    camera.rotX = (float) (camera.lastX + x);
+    camera.rotY = (float) (camera.lastY + y);
 }
 
 void mouseState(int button, int state, int x, int y)
 {
     // Button: GLUT_LEFT_BUTTON && GLUT_RIGHT_BUTTON
     // State: GLUT_DOWN && GLUT_UP
+
+    if( button == GLUT_LEFT_BUTTON) {
+        if(state == GLUT_DOWN) {
+            camera.lastX = x;
+            camera.lastY = y;
+        }
+
+    } else {
+        if(state == GLUT_UP) {
+            //camera.zoom -= 0.1f;
+        }
+    }
 }
 
 void specialKeyboard(int key, int x, int y) {
@@ -195,6 +212,22 @@ void update_frog_state_numerical(double dt) {
     frogger.sphere.pos.x += frogger.velocity.x * dt;
     frogger.sphere.pos.y += frogger.velocity.y * dt;
     frogger.velocity.y += gravity * dt;
+}
+
+void camera_movement() {
+    glLoadIdentity();
+
+    // Zoom by translating along the Z axis
+    //glTranslated(0, 0, camera.zoom);
+
+    // Rotate camera using the X rotation
+//    glRotated(camera.rotX, 1, 0, 0);
+
+    // Rotate camera using the Y rotation
+    glRotated(camera.rotY, 0, 1, 0);
+
+    // Request a new frame
+    glutPostRedisplay();
 }
 
 void draw_sphere() {
@@ -296,15 +329,15 @@ void build_circle_extras(bool tangents, bool normals) {
         double x = frogger.sphere.radius * cos(theta);
         double y = frogger.sphere.radius * sin(theta);
         double z = 0.0;
-        vector3d start = {frogger.sphere.pos.x + x, frogger.sphere.pos.y + y,
+        Vector3d start = {frogger.sphere.pos.x + x, frogger.sphere.pos.y + y,
         frogger.sphere.pos.z + z};
 
         if (tangents) {
-            vector3d tangent = {-y, x, z};
+            Vector3d tangent = {-y, x, z};
             build_vector(start, tangent, 0.1, cyan);
         }
         if (normals) {
-            vector3d normal = {x, y, z};
+            Vector3d normal = {x, y, z};
             build_vector(start, normal, 0.1, yellow);
         }
     }
@@ -331,20 +364,20 @@ void build_parabola_extras(bool tangents, bool normals) {
                    + 0.5 * gravity * t * t;
         double z = 0.0;
 
-        vector3d start = {frogger.launch_location.x + x , y, z};
+        Vector3d start = {frogger.launch_location.x + x , y, z};
 
         if (tangents) {
-            vector3d tangent = {vx, vy, vz};
+            Vector3d tangent = {vx, vy, vz};
             build_vector(start, tangent, 0.1, cyan);
         }
         if (normals) {
-            vector3d normal = {-vy, vx, vz};
+            Vector3d normal = {-vy, vx, vz};
             build_vector(start, normal, 0.1, yellow);
         }
     }
 }
 
-void build_vector(vector3d p, vector3d q, double scale, const double *color) {
+void build_vector(Vector3d p, Vector3d q, double scale, const double *color) {
     double magnitude = sqrt( pow(q.x,2) * pow(q.y,2) + pow(q.z,2) );
     double x = (q.x / magnitude) * scale;
     double y = (q.y / magnitude) * scale;

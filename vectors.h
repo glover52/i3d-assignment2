@@ -4,21 +4,21 @@
 typedef struct {
     double x;
     double y;
-} vector2d;
+} Vector2d;
 
 typedef struct {
     double x;
     double y;
     double z;
-} vector3d;
+} Vector3d;
 
 typedef struct {
     double angle;
     double speed;
-} velocity_polar;
+} VelocityPolar;
 
-typedef vector3d velocity_cartesian;
+typedef Vector3d velocity_cartesian;
 
-velocity_cartesian polar_to_cartesian(velocity_polar);
+velocity_cartesian polar_to_cartesian(VelocityPolar);
 
 #endif

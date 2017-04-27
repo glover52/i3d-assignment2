@@ -4,8 +4,8 @@
 #include "vectors.h"
 
 typedef struct {
-    vector3d pos;
+    Vector3d pos;
     const double radius;
-} sphere;
+} Sphere;
 
 #endif

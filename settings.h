@@ -11,6 +11,6 @@ typedef struct {
     bool jumping;
     double jump_start_timestamp;
     bool analytical;
-} settings;
+} Settings;
 
 #endif

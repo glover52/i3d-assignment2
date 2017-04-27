@@ -5,10 +5,10 @@
 #include "vectors.h"
 
 typedef struct {
-    sphere sphere;
+    Sphere sphere;
     velocity_cartesian velocity;
-    velocity_polar launch_velocity;
-    vector3d launch_location;
-} frog;
+    VelocityPolar launch_velocity;
+    Vector3d launch_location;
+} Frog;
 
 #endif

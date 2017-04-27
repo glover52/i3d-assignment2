@@ -54,6 +54,8 @@ void update_frog_state_numerical(double);
 
 // Open a GL context to draw objects
 
+void camera_movement();
+
 void draw_axes(double);
 
 void draw_sphere();
@@ -68,7 +70,7 @@ void draw_extras(bool tangents, bool normals);
 
 void build_line(const double *p, const double *q, const double *color);
 
-void build_vector(vector3d p, vector3d q, double scale, const double *color);
+void build_vector(Vector3d p, Vector3d q, double scale, const double *color);
 
 void build_sphere_parametric(double, double);
 
