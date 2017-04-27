@@ -1,6 +1,7 @@
 #include "frogger.h"
 #include "settings.h"
 #include "camera.h"
+#include "frog.h"
 
 
 Frog frogger = {
@@ -177,7 +178,6 @@ void keyboard(unsigned char key, int x, int y) {
             mode.jump_start_timestamp = glutGet(GLUT_ELAPSED_TIME)
                                         / millis_per_sec;
             mode.jumping = true;
-            printf("JUMPING!\n");
             break;
         case 27: // [ESC]
         case 'q':
@@ -206,16 +206,29 @@ void update_frog_state_analytical(double time) {
     frogger.sphere.pos.x = v.x * time + frogger.launch_location.x;
     frogger.sphere.pos.y = 0.5 * gravity * pow(time, 2) + v.y * time
                            + frogger.launch_location.y;
+
+    // Modify camera variables to make camera follow frog
+    camera.pos.x = -frogger.sphere.pos.x;
+    camera.pos.y = -frogger.sphere.pos.y;
+    camera.pos.z = -frogger.sphere.pos.z;
 }
 
 void update_frog_state_numerical(double dt) {
     frogger.sphere.pos.x += frogger.velocity.x * dt;
     frogger.sphere.pos.y += frogger.velocity.y * dt;
     frogger.velocity.y += gravity * dt;
+
+    // Modify camera variables to make camera follow frog
+    camera.pos.x = -frogger.sphere.pos.x;
+    camera.pos.y = -frogger.sphere.pos.y;
+    camera.pos.z = -frogger.sphere.pos.z;
 }
 
 void camera_movement() {
     glLoadIdentity();
+
+    // Make the camera move with the sphere
+    glTranslated(camera.pos.x, camera.pos.y, camera.pos.z);
 
     // Zoom by translating along the Z axis
     //glTranslated(0, 0, camera.zoom);
