@@ -423,11 +423,14 @@ void build_parabola(void) {
         double t = i * step;
 
         double x = frogger.launch_velocity.speed * t
-                   * cos(frogger.launch_velocity.angle);
+                    * cos(frogger.launch_velocity.angle);
 
         double y = frogger.launch_velocity.speed * t
-                   * sin(frogger.launch_velocity.angle)
-                   + 0.5f * gravity * t * t;
+                    * sin(frogger.launch_velocity.angle)
+                    + 0.5f * gravity * t * t;
+
+        double z = frogger.launch_velocity.speed * t
+                    * tan(frogger.rotation);
 
         glVertex3d(x + frogger.launch_location.x, y, 0);
     }
