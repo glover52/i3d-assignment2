@@ -13,6 +13,9 @@ Settings mode = {.segments=8 };
 
 Camera camera;
 
+GLuint the_car = 0;
+GLuint the_log = 0; 
+
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
@@ -35,11 +38,16 @@ int main(int argc, char **argv) {
     glutDisplayFunc(display);
     glutIdleFunc(animate);
 
+    init();
     glutMainLoop();
 
     return EXIT_SUCCESS;
 }
 
+void init() {
+    the_car = create_car();
+    the_log = create_log();
+}
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -63,6 +71,7 @@ void display() {
     glPopMatrix();
 
     draw_axes(1.0f);
+    draw_obstacles();
 
     glutSwapBuffers();
 }
@@ -365,6 +374,14 @@ void draw_axes(double length) {
     glPopAttrib();
 }
 
+void draw_obstacles() {
+    glPushAttrib(GL_CURRENT_BIT);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    build_obstacles();
+    glEnd();
+    glPopAttrib();
+}
+
 void build_grid(int n, int j) {
     double x, z, xStep, zStep;
     xStep = pow(n, -1) * 2.0;
@@ -469,6 +486,59 @@ void build_parabola_extras(bool tangents, bool normals) {
             build_vector(start, normal, 0.1, yellow);
         }
     }
+}
+
+void build_obstacles() {
+    for (int i = 0; i < n_logs; i++) {
+        glPushMatrix();
+        double offset = i * 0.3;
+        glTranslated(0.0 + offset, 0.0, 0.2 + offset);
+        glRotated(45.0 - i * 25.0, 0.0, 1.0, 0.0);
+        glCallList(the_log);
+        glPopMatrix();
+    }
+
+    for (int i = 0; i < n_cars; i++) {
+        glPushMatrix();
+        double offset = i * 0.2;
+        glTranslated(-0.8 + offset, 0.0, -0.8 + offset);
+        glCallList(the_car);
+        glPopMatrix();
+    }
+}
+
+GLuint create_log() {
+    GLUquadricObj *quadric = gluNewQuadric();
+
+    GLuint theLog = glGenLists(1);
+    glNewList(theLog, GL_COMPILE);
+
+    glShadeModel(GL_FLAT);
+    double radius = 0.05;
+    double height = 0.2;
+    gluCylinder(quadric, radius, radius, height, 8, 8);
+
+    glEndList();
+
+    gluDeleteQuadric(quadric);
+
+    return theLog;
+}
+
+GLuint create_car() {
+    GLUquadricObj *quadric = gluNewQuadric();
+
+    GLuint theCar = glGenLists(1);
+    glNewList(theCar, GL_COMPILE);
+
+    glShadeModel(GL_FLAT);
+    glutSolidCube(0.1);
+
+    glEndList();
+
+    gluDeleteQuadric(quadric);
+
+    return theCar;
 }
 
 void build_vector(Vector3d p, Vector3d q, double scale, const double *color) {
