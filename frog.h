@@ -9,6 +9,7 @@ typedef struct {
     velocity_cartesian velocity;
     VelocityPolar launch_velocity;
     Vector3d launch_location;
+    double rotation;
 } Frog;
 
 #endif

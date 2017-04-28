@@ -50,10 +50,18 @@ void display() {
 
     camera_movement();
     draw_grid(8);
+
+    glPushMatrix();
+    // Make the camera move with the sphere
+//    glTranslated(-camera.pos.x, -camera.pos.y, -camera.pos.z);
+//    glRotated(frogger.rotation, 0, 1, 0);
+    // Make the camera move with the sphere
     draw_sphere();
     draw_parabola();
     draw_velocity();
     draw_extras(mode.tangents, mode.normals);
+    glPopMatrix();
+
     draw_axes(1.0f);
 
     glutSwapBuffers();
@@ -104,28 +112,39 @@ void mouseState(int button, int state, int x, int y)
     // Button: GLUT_LEFT_BUTTON && GLUT_RIGHT_BUTTON
     // State: GLUT_DOWN && GLUT_UP
 
-    if( button == GLUT_LEFT_BUTTON) {
-        if(state == GLUT_DOWN) {
-            camera.lastX = x;
-            camera.lastY = y;
-        }
+    if( button == GLUT_LEFT_BUTTON ) {
+        if(state == GLUT_UP) return;
 
+        camera.lastX = x;
+        camera.lastY = y;
+
+    } else if( button == GLUT_RIGHT_BUTTON ) {
+        if(state == GLUT_UP) return;
+
+        // Input zoom here
+//        camera.zoom += 0.01f;
     } else {
-        if(state == GLUT_UP) {
-            //camera.zoom -= 0.1f;
-        }
+        if(state == GLUT_UP) return;
+
+        // Zoom in on scroll up, zoom out on scroll down
+        camera.zoom += (button == 3) ? 0.01 : -0.01;
     }
 }
 
 void specialKeyboard(int key, int x, int y) {
     switch (key) {
         case GLUT_KEY_LEFT:
+            if(!mode.jumping)
+                frogger.rotation += 6;
             break;
         case GLUT_KEY_RIGHT:
+            if(!mode.jumping)
+                frogger.rotation -= 6;
             break;
         default:
             break;
     }
+
     glutPostRedisplay();
 }
 
@@ -164,11 +183,11 @@ void keyboard(unsigned char key, int x, int y) {
                 frogger.launch_velocity.speed -= 0.1;
             break;
         case 'a':
-            if (frogger.launch_velocity.angle < 2)
+            if (frogger.launch_velocity.angle < 2.68)
                 frogger.launch_velocity.angle += 0.1;
             break;
         case 'd':
-            if (frogger.launch_velocity.angle > 0.1)
+            if (frogger.launch_velocity.angle > 0.5)
                 frogger.launch_velocity.angle -= 0.1;
             break;
         case ' ':
@@ -266,7 +285,7 @@ void camera_movement() {
     glTranslated(camera.pos.x, camera.pos.y, camera.pos.z);
 
     // Zoom by translating along the Z axis
-    //glTranslated(0, 0, camera.zoom);
+    glTranslated(0, 0, camera.zoom);
 
     // Request a new frame
     glutPostRedisplay();
@@ -404,6 +423,7 @@ void build_circle_extras(bool tangents, bool normals) {
         double x = frogger.sphere.radius * cos(theta);
         double y = frogger.sphere.radius * sin(theta);
         double z = 0.0;
+
         Vector3d start = {frogger.sphere.pos.x + x, frogger.sphere.pos.y + y,
         frogger.sphere.pos.z + z};
 
@@ -437,9 +457,8 @@ void build_parabola_extras(bool tangents, bool normals) {
         double y = frogger.launch_velocity.speed * t
                    * sin(frogger.launch_velocity.angle)
                    + 0.5 * gravity * t * t;
-        double z = 0.0;
 
-        Vector3d start = {frogger.launch_location.x + x , y, z};
+        Vector3d start = {frogger.launch_location.x + x , y, 0};
 
         if (tangents) {
             Vector3d tangent = {vx, vy, vz};
