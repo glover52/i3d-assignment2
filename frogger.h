@@ -90,4 +90,6 @@ void build_obstacles(void);
 
 GLuint create_log(void);
 
+GLuint create_car(void);
+
 #endif

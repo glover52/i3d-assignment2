@@ -475,6 +475,17 @@ void build_obstacles() {
     glTranslated(0.2, 0.0, 0.0);
     /* glRotated(30.0, 0.0, 0.0, 0.0); */
     glCallList(log);
+
+    GLuint car = create_car();
+
+    glTranslated(-0.8, 0.0, -0.8);
+    glCallList(car);
+
+    glTranslated(-0.2, 0.0, -0.1);
+    glCallList(car);
+
+    glTranslated(-0.2, 0.0, -0.1);
+    glCallList(car);
 }
 
 GLuint create_log() {
@@ -484,7 +495,6 @@ GLuint create_log() {
     glNewList(theLog, GL_COMPILE);
 
     glShadeModel(GL_FLAT);
-    glClearColor(0.0, 0.0, 0.0, 0.0);
     double radius = 0.05;
     double height = 0.2;
     gluCylinder(quadric, radius, radius, height, 8, 8);
@@ -496,7 +506,21 @@ GLuint create_log() {
     return theLog;
 }
 
+GLuint create_car() {
+    GLUquadricObj *quadric = gluNewQuadric();
 
+    GLuint theCar = glGenLists(1);
+    glNewList(theCar, GL_COMPILE);
+
+    glShadeModel(GL_FLAT);
+    glutSolidCube(0.1);
+
+    glEndList();
+
+    gluDeleteQuadric(quadric);
+
+    return theCar;
+}
 
 void build_vector(Vector3d p, Vector3d q, double scale, const double *color) {
     double magnitude = sqrt( pow(q.x,2) * pow(q.y,2) + pow(q.z,2) );
