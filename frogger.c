@@ -13,6 +13,9 @@ Settings mode = {.segments=8 };
 
 Camera camera;
 
+GLuint the_car = 0;
+GLuint the_log = 0; 
+
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
     glutInitDisplayMode(GLUT_RGB | GLUT_DOUBLE | GLUT_DEPTH);
@@ -35,11 +38,16 @@ int main(int argc, char **argv) {
     glutDisplayFunc(display);
     glutIdleFunc(animate);
 
+    init();
     glutMainLoop();
 
     return EXIT_SUCCESS;
 }
 
+void init() {
+    the_car = create_car();
+    the_log = create_log();
+}
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -462,30 +470,22 @@ void build_parabola_extras(bool tangents, bool normals) {
 }
 
 void build_obstacles() {
-    GLuint log = create_log();
+    for (int i = 0; i < n_logs; i++) {
+        glPushMatrix();
+        double offset = i * 0.3;
+        glTranslated(0.0 + offset, 0.0, 0.2 + offset);
+        glRotated(45.0 - i * 25.0, 0.0, 1.0, 0.0);
+        glCallList(the_log);
+        glPopMatrix();
+    }
 
-    glTranslated(0.0, 0.0, 0.2);
-    /* glRotated(45.0, 0.0, 1.0, 0.0); */
-    glCallList(log);
-
-    glTranslated(0.2, 0.0, 0.2);
-    /* glRotated(30.0, 0.0, 1.0, 0.0); */
-    glCallList(log);
-
-    glTranslated(0.2, 0.0, 0.0);
-    /* glRotated(30.0, 0.0, 0.0, 0.0); */
-    glCallList(log);
-
-    GLuint car = create_car();
-
-    glTranslated(-0.8, 0.0, -0.8);
-    glCallList(car);
-
-    glTranslated(-0.2, 0.0, -0.1);
-    glCallList(car);
-
-    glTranslated(-0.2, 0.0, -0.1);
-    glCallList(car);
+    for (int i = 0; i < n_cars; i++) {
+        glPushMatrix();
+        double offset = i * 0.2;
+        glTranslated(-0.8 + offset, 0.0, -0.8 + offset);
+        glCallList(the_car);
+        glPopMatrix();
+    }
 }
 
 GLuint create_log() {

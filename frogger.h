@@ -32,6 +32,8 @@
 #define W_HEIGHT 480
 #define W_DEFAULT 10
 
+void init(void);
+
 // Handle GLUT events
 
 void display(void);
