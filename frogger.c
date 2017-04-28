@@ -55,6 +55,7 @@ void display() {
     draw_velocity();
     draw_extras(mode.tangents, mode.normals);
     draw_axes(1.0f);
+    draw_obstacles();
 
     glutSwapBuffers();
 }
@@ -346,6 +347,14 @@ void draw_axes(double length) {
     glPopAttrib();
 }
 
+void draw_obstacles() {
+    glPushAttrib(GL_CURRENT_BIT);
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    build_obstacles();
+    glEnd();
+    glPopAttrib();
+}
+
 void build_grid(int n, int j) {
     double x, z, xStep, zStep;
     xStep = pow(n, -1) * 2.0;
@@ -451,6 +460,43 @@ void build_parabola_extras(bool tangents, bool normals) {
         }
     }
 }
+
+void build_obstacles() {
+    GLuint log = create_log();
+
+    glTranslated(0.0, 0.0, 0.2);
+    /* glRotated(45.0, 0.0, 1.0, 0.0); */
+    glCallList(log);
+
+    glTranslated(0.2, 0.0, 0.2);
+    /* glRotated(30.0, 0.0, 1.0, 0.0); */
+    glCallList(log);
+
+    glTranslated(0.2, 0.0, 0.0);
+    /* glRotated(30.0, 0.0, 0.0, 0.0); */
+    glCallList(log);
+}
+
+GLuint create_log() {
+    GLUquadricObj *quadric = gluNewQuadric();
+
+    GLuint theLog = glGenLists(1);
+    glNewList(theLog, GL_COMPILE);
+
+    glShadeModel(GL_FLAT);
+    glClearColor(0.0, 0.0, 0.0, 0.0);
+    double radius = 0.05;
+    double height = 0.2;
+    gluCylinder(quadric, radius, radius, height, 8, 8);
+
+    glEndList();
+
+    gluDeleteQuadric(quadric);
+
+    return theLog;
+}
+
+
 
 void build_vector(Vector3d p, Vector3d q, double scale, const double *color) {
     double magnitude = sqrt( pow(q.x,2) * pow(q.y,2) + pow(q.z,2) );

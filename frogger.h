@@ -54,19 +54,21 @@ void update_frog_state_numerical(double);
 
 // Open a GL context to draw objects
 
-void camera_movement();
+void camera_movement(void);
 
 void draw_grid(int);
 
 void draw_axes(double);
 
-void draw_sphere();
+void draw_sphere(void);
 
-void draw_parabola();
+void draw_parabola(void);
 
 void draw_velocity(void);
 
 void draw_extras(bool tangents, bool normals);
+
+void draw_obstacles(void);
 
 // Build up the required vertexes within the GL context
 
@@ -83,5 +85,9 @@ void build_parabola(void);
 void build_circle_extras(bool tangents, bool normals);
 
 void build_parabola_extras(bool tangents, bool normals);
+
+void build_obstacles(void);
+
+GLuint create_log(void);
 
 #endif
