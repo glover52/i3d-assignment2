@@ -8,7 +8,7 @@
 const double origin[] = {0.0, 0.0, 0.0};
 const double gravity = -9.8;
 const double millis_per_sec = 1000;
-const double n_logs = 3;
-const double n_cars = 3;
+const int n_logs = 3;
+const int n_cars = 3;
 
 #endif
