@@ -3,7 +3,6 @@
 #include "camera.h"
 #include "frog.h"
 
-
 Frog frogger = {
         .sphere={.radius=0.05},
         .launch_velocity={1.0, 1.0}
@@ -15,6 +14,9 @@ Camera camera;
 
 GLuint the_car = 0;
 GLuint the_log = 0; 
+
+double logs[N_LOGS] = { 0 };
+double cars[N_CARS] = { 0 };
 
 int main(int argc, char **argv) {
     glutInit(&argc, argv);
@@ -45,8 +47,18 @@ int main(int argc, char **argv) {
 }
 
 void init() {
+    srand(time(NULL));
     the_car = create_car();
     the_log = create_log();
+
+    // Initial offset for each car / log
+    for (int i = 0; i < N_LOGS; i++) {
+        logs[i] -= rand();
+    }
+
+    for (int i = 0; i < N_CARS; i++) {
+        cars[i] -= rand();
+    }
 }
 
 void display() {
@@ -77,12 +89,8 @@ void display() {
 }
 
 void animate() {
-    if (!mode.jumping)
-        return;
-
     static double previous_timestamp = -1.0;
-    double timestamp = (glutGet(GLUT_ELAPSED_TIME) / millis_per_sec)
-                       - mode.jump_start_timestamp;
+    double timestamp = (glutGet(GLUT_ELAPSED_TIME) / millis_per_sec);
 
     if (previous_timestamp < 0.0) {
         previous_timestamp = timestamp;
@@ -91,20 +99,30 @@ void animate() {
 
     double delta_time = timestamp - previous_timestamp;
 
-    if (mode.analytical)
-        update_frog_state_analytical(timestamp);
-
-    else
+    if (mode.jumping) {
         update_frog_state_numerical(delta_time);
+    }
 
     previous_timestamp = timestamp;
 
-    if (frogger.sphere.pos.y < 0.0) {
+    if (mode.jumping && frogger.sphere.pos.y < 0.0) {
         mode.jumping = false;
         frogger.sphere.pos.y = 0.0;
         frogger.launch_location = frogger.sphere.pos;
         previous_timestamp = -1.0;
     }
+
+    // Update logs and cars
+    for (int i = 0; i < N_LOGS; i++) {
+        logs[i] += delta_time / 2.0;
+        logs[i] = fmod(logs[i], 2.0);
+    }
+
+    for (int i = 0; i < N_LOGS; i++) {
+        cars[i] += delta_time / 2.0;
+        cars[i] = fmod(cars[i], 2.0);
+    }
+
 
     glutPostRedisplay();
 }
@@ -220,14 +238,6 @@ void keyboard(unsigned char key, int x, int y) {
                 mode.segments /= 2;
             break;
 
-        /* Toggle between integrations (deprecated) */
-        case 'i':
-            if (mode.jumping)
-                break;
-            mode.analytical = !mode.analytical;
-            printf("Analytical: %d\n", mode.analytical);
-            break;
-
         /* Exit the program */
         case 27: // [ESC]
         case 'q':
@@ -253,19 +263,6 @@ void keyboard(unsigned char key, int x, int y) {
 
     // Request a new frame
     glutPostRedisplay();
-}
-
-void update_frog_state_analytical(double time) {
-    /* Analytical integration NOT required */
-    velocity_cartesian v = polar_to_cartesian(frogger.launch_velocity);
-    frogger.sphere.pos.x = v.x * time + frogger.launch_location.x;
-    frogger.sphere.pos.y = 0.5 * gravity * pow(time, 2) + v.y * time
-                           + frogger.launch_location.y;
-
-    // Modify camera variables to make camera follow frog
-    camera.pos.x = -frogger.sphere.pos.x;
-    camera.pos.y = -frogger.sphere.pos.y;
-    camera.pos.z = -frogger.sphere.pos.z;
 }
 
 void update_frog_state_numerical(double dt) {
@@ -492,19 +489,23 @@ void build_parabola_extras(bool tangents, bool normals) {
 }
 
 void build_obstacles() {
-    for (int i = 0; i < n_logs; i++) {
-        glPushMatrix();
+    for (int i = 0; i < N_LOGS; i++) {
+        double position = logs[i] - 1.0;
         double offset = i * 0.3;
-        glTranslated(0.0 + offset, 0.0, 0.2 + offset);
+
+        glPushMatrix();
+        glTranslated(position, 0.0, 0.2 + offset);
         glRotated(45.0 - i * 25.0, 0.0, 1.0, 0.0);
         glCallList(the_log);
         glPopMatrix();
     }
 
-    for (int i = 0; i < n_cars; i++) {
-        glPushMatrix();
+    for (int i = 0; i < N_CARS; i++) {
+        double position = cars[i] - 1.0;
         double offset = i * 0.2;
-        glTranslated(-0.8 + offset, 0.0, -0.8 + offset);
+
+        glPushMatrix();
+        glTranslated(position, 0.0, -0.8 + offset);
         glCallList(the_car);
         glPopMatrix();
     }
