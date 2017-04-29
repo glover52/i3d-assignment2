@@ -1,16 +1,19 @@
 #include "frogger.h"
 #include "settings.h"
-#include "camera.h"
-#include "frog.h"
 
 Frog frogger = {
         .sphere={.radius=0.05},
         .launch_velocity={1.0, 1.0}
 };
 
-Settings mode = {.segments=8 };
+Settings mode = {.segments=8, .axes=true};
 
 Camera camera;
+
+GLfloat light_position[] = { 1.0, 1.0, 1.0, 0.0 };
+GLfloat mat_color[] = { 1.0, 0.0, 0.0 };
+GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
+GLfloat mat_shininess[] = { 100.0 };
 
 GLuint the_car = 0;
 GLuint the_log = 0; 
@@ -47,23 +50,35 @@ int main(int argc, char **argv) {
 }
 
 void init() {
-    srand(time(NULL));
+    srand( time(NULL) );
+
     the_car = create_car();
     the_log = create_log();
 
     // Initial offset for each car / log
-    for (int i = 0; i < N_LOGS; i++) {
+    for (int i = 0; i < N_LOGS; i++)
         logs[i] -= rand();
-    }
 
-    for (int i = 0; i < N_CARS; i++) {
+    for (int i = 0; i < N_CARS; i++)
         cars[i] -= rand();
-    }
+
+    Vector3d pos = {0, 0, -1};
+    frogger.sphere.pos = pos;
+    frogger.launch_location = pos;
 }
 
 void display() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     glEnable(GL_DEPTH_TEST);
+
+    if(mode.lighting) {
+        glEnable(GL_LIGHTING);
+        glEnable(GL_LIGHT0);
+        glLightfv(GL_LIGHT0, GL_POSITION, light_position);
+    } else {
+        glDisable(GL_LIGHTING);
+        glDisable(GL_LIGHT0);
+    }
 
 //    glRotated(0.5, 0.0, 1.0, 0);
 //    glutPostRedisplay();
@@ -71,16 +86,16 @@ void display() {
     camera_movement();
     draw_grid(8);
 
-    glPushMatrix();
-    // Make the camera move with the sphere
+//    glPushMatrix();
 //    glTranslated(-camera.pos.x, -camera.pos.y, -camera.pos.z);
 //    glRotated(frogger.rotation, 0, 1, 0);
-    // Make the camera move with the sphere
+
     draw_sphere();
     draw_parabola();
     draw_velocity();
     draw_extras(mode.tangents, mode.normals);
-    glPopMatrix();
+
+//    glPopMatrix();
 
     draw_axes(1.0f);
     draw_obstacles();
@@ -175,11 +190,11 @@ void specialKeyboard(int key, int x, int y) {
     glutPostRedisplay();
 }
 
-
 void keyboard(unsigned char key, int x, int y) {
     switch (key) {
         /* Toggle axes (should also draw an axes at local origin of every mesh being rendered) */
         case 'o':
+            mode.axes = !mode.axes;
             break;
 
         /* Toggle normals (this should also toggle the tangents for the parabola) */
@@ -189,16 +204,19 @@ void keyboard(unsigned char key, int x, int y) {
             printf("Normals: %d, Tangents: %d\n", mode.normals, mode.tangents);
             break;
 
-        /* Toggle wire-frame */
+        /* Toggle wireframe */
         case 'p':
+            mode.wireframe = !mode.wireframe;
             break;
 
         /* Toggle lighting */
         case 'l':
+            mode.lighting = !mode.lighting;
             break;
 
         /* Toggle textures */
         case 't':
+            mode.textures = !mode.textures;
             break;
 
         case 'w':
@@ -298,13 +316,20 @@ void camera_movement() {
 }
 
 void draw_grid(int n) {
-    glPushAttrib(GL_CURRENT_BIT);
+    if(!mode.lighting) {
+        glPushAttrib(GL_CURRENT_BIT);
+        glColor3dv(green);
+    } else {
+        glPushAttrib(GL_LIGHTING_BIT);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, green_float);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+    }
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 
-    for (int j = 0; j < n; j++) {
+    for (int i = 0; i < n; ++i) {
         glBegin(GL_QUAD_STRIP);
-        glColor3dv(green);
-        build_grid(n, j);
+        build_grid(n, i);
         glEnd();
     }
 
@@ -312,10 +337,20 @@ void draw_grid(int n) {
 }
 
 void draw_sphere() {
-    glPushAttrib(GL_CURRENT_BIT);
-    double step_phi = M_PI / mode.segments;
+    glPushMatrix();
+
+    if(!mode.lighting) {
+        glPushAttrib(GL_CURRENT_BIT);
+        glColor3dv(white);
+    } else {
+        glPushAttrib(GL_LIGHTING_BIT);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, white_float);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+    }
 
     glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+    double step_phi = M_PI / mode.segments;
     for (int j = 0; j <= mode.segments; j++) {
         double phi = j / (double)mode.segments * M_PI;
         glBegin(GL_QUAD_STRIP);
@@ -325,6 +360,7 @@ void draw_sphere() {
     }
 
     glPopAttrib();
+    glPopMatrix();
 }
 
 void draw_parabola() {
@@ -353,14 +389,20 @@ void draw_extras(bool tangents, bool normals) {
     glBegin(GL_LINES);
     build_circle_extras(tangents, normals);
     build_parabola_extras(tangents, normals);
+    build_grid_extras(normals);
     glEnd();
     glPopAttrib();
 }
 
 void draw_axes(double length) {
+    if (!mode.axes) return;
+
     double x_axis[] = {length, 0.0, 0.0};
     double y_axis[] = {0.0, length, 0.0};
     double z_axis[] = {0.0, 0.0, length};
+
+    if(mode.lighting)
+        glDisable(GL_LIGHTING);
 
     glPushAttrib(GL_CURRENT_BIT);
     glBegin(GL_LINES);
@@ -369,6 +411,9 @@ void draw_axes(double length) {
     build_line(origin, z_axis, blue);
     glEnd();
     glPopAttrib();
+
+    if(mode.lighting)
+        glEnable(GL_LIGHTING);
 }
 
 void draw_obstacles() {
@@ -379,14 +424,14 @@ void draw_obstacles() {
     glPopAttrib();
 }
 
-void build_grid(int n, int j) {
+void build_grid(int n, int i) {
     double x, z, xStep, zStep;
     xStep = pow(n, -1) * 2.0;
     zStep = pow(n, -1) * 2.0; // xStep and zStep are the same, but could be different
 
-    for (int i = 0; i <= n; i++) {
-        x = -1.0 + i * xStep;
-        z = -1.0 + j * zStep;
+    for (int j = 0; j <= n; ++j) {
+        x = -1.0 + j * xStep;
+        z = -1.0 + i * zStep;
 
         glVertex3d(x, 0, z);
         // Replace this comment with calculation to work out next z value
@@ -426,10 +471,9 @@ void build_parabola(void) {
                     * sin(frogger.launch_velocity.angle)
                     + 0.5f * gravity * t * t;
 
-        double z = frogger.launch_velocity.speed * t
-                    * tan(frogger.rotation);
+        double z = 0; // x * tan(frogger.rotation);
 
-        glVertex3d(x + frogger.launch_location.x, y, 0);
+        glVertex3d(x + frogger.launch_location.x, y, z + frogger.launch_location.z);
     }
 }
 
@@ -475,7 +519,9 @@ void build_parabola_extras(bool tangents, bool normals) {
                    * sin(frogger.launch_velocity.angle)
                    + 0.5 * gravity * t * t;
 
-        Vector3d start = {frogger.launch_location.x + x , y, 0};
+        double z = 0; // x * tan(frogger.rotation);
+
+        Vector3d start = {frogger.launch_location.x + x , y, z};
 
         if (tangents) {
             Vector3d tangent = {vx, vy, vz};
@@ -488,7 +534,45 @@ void build_parabola_extras(bool tangents, bool normals) {
     }
 }
 
+void build_grid_extras(bool normals) {
+    if(!normals) return;
+
+    double x, z, xStep, zStep;
+    double n = 8;
+    xStep = pow(n, -1) * 2.0;
+    zStep = pow(n, -1) * 2.0;
+
+    for(int i = 0; i < n; ++i) {
+        for(int j = 0; j <= n; ++j) {
+            x = -1.0 + j * xStep;
+            z = -1.0 + i * zStep;
+
+            Vector3d start = {x, 0, z};
+            Vector3d normal = {0, x, z};
+            build_vector(start, normal, 0.1, yellow);
+        }
+    }
+}
+
 void build_obstacles() {
+    if(!mode.lighting) {
+        glPushAttrib(GL_CURRENT_BIT);
+        glColor3dv(cyan);
+
+        glPushAttrib(GL_CURRENT_BIT);
+        glColor3dv(brown);
+    } else {
+        glPushAttrib(GL_LIGHTING_BIT);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, cyan_float);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+
+        glPushAttrib(GL_LIGHTING_BIT);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE, brown_float);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SPECULAR, mat_specular);
+        glMaterialfv(GL_FRONT_AND_BACK, GL_SHININESS, mat_shininess);
+    }
+
     for (int i = 0; i < N_LOGS; i++) {
         double position = logs[i] - 1.0;
         double offset = i * 0.3;
@@ -499,6 +583,7 @@ void build_obstacles() {
         glCallList(the_log);
         glPopMatrix();
     }
+    glPopAttrib();
 
     for (int i = 0; i < N_CARS; i++) {
         double position = cars[i] - 1.0;
@@ -509,6 +594,7 @@ void build_obstacles() {
         glCallList(the_car);
         glPopMatrix();
     }
+    glPopAttrib();
 }
 
 GLuint create_log() {

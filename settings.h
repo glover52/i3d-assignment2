@@ -5,12 +5,17 @@
 
 typedef struct {
     bool cartesian;
-    bool normals;
     bool tangents;
     int segments;
     bool jumping;
     double jump_start_timestamp;
     bool analytical;
+
+    bool axes;
+    bool normals;
+    bool wireframe;
+    bool lighting;
+    bool textures;
 } Settings;
 
 #endif

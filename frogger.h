@@ -27,6 +27,9 @@
 #include "frog.h"
 #include "colours.h"
 #include "settings.h"
+#include "camera.h"
+
+#include <sys/time.h>
 
 #define W_NAME "COSC1187 Assignment 2 - Frogger"
 #define W_WIDTH 640
@@ -88,6 +91,8 @@ void build_parabola(void);
 void build_circle_extras(bool tangents, bool normals);
 
 void build_parabola_extras(bool tangents, bool normals);
+
+void build_grid_extras(bool);
 
 void build_obstacles(void);
 

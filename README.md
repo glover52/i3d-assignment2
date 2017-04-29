@@ -18,9 +18,9 @@ Interactive 3D Graphics and Animation
 - [ ] Animate the frog using the numerical integration technique from assignment 1, but now in three dimensions. No analytical integration required.
 - [-] Use a third person perspective camera, that follows the frog as it moves.
 - [-] Draw a simple world (just a grid on the xz plane for now).
-- [ ] Draw moving cylinders to represent logs, and moving cubes to represent cars.
+- [X] Draw moving cylinders to represent logs, and moving cubes to represent cars.
 - [ ] Draw normal vectors for all geometry being rendered (only tangents for the parabola however).
-- [ ] Apply lighting to all geometry.
+- [X] Apply lighting to all geometry.
 - [ ] Apply texturing to the logs, and optionally cars and ground plane.
 - [X] Add keyboard controls for for toggling lighting/texturing/wireframe mode
 
