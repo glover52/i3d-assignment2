@@ -4,12 +4,12 @@ LIBS=-lGL -lGLU -lglut -lm ./libSOIL.a
 
 # Windows (cygwin)
 ifeq ($(OS), "Windows_NT")
-LDFLAGS = -lopengl32 -lglu32 -lglut32
+LIBS = -lopengl32 -lglu32 -lglut32
 endif
 
 # OS X
 ifeq "$(shell uname)" "Darwin"
-LIBS = -framework Carbon -framework QuickTime -framework OpenGL -framework GLUT
+LIBS = -framework Carbon -framework OpenGL -framework GLUT -lSOIL
 endif
 
 SOURCES=$(wildcard *.c)

@@ -7,7 +7,17 @@
 #ifndef TEXTURE_H
 #define TEXTURE_H
 
-#include <GL/gl.h>
+#if _WIN32
+#   include <Windows.h>
+#endif
+
+#if __APPLE__
+#   include <OpenGL/gl.h>
+#else
+#   include <GL/gl.h>
+#endif
+
+
 #include "SOIL.h"
 
 GLuint loadTexture(const char *filename);
