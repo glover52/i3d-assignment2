@@ -136,7 +136,7 @@ void display() {
     draw_parabola();
     draw_velocity();
     draw_obstacles();
-    draw_grid(8);
+    draw_grid(mode.segments);
     draw_extras(mode.tangents, mode.normals);
 
     glutSwapBuffers();
@@ -638,7 +638,7 @@ void build_grid_extras(bool normals) {
     if(!normals) return;
 
     double x, z, xStep, zStep;
-    double n = 8;
+    double n = mode.segments;
     xStep = pow(n, -1) * 2.0;
     zStep = pow(n, -1) * 2.0;
 
@@ -648,7 +648,7 @@ void build_grid_extras(bool normals) {
             z = -1.0 + i * zStep;
 
             Vector3d start = {x, 0, z};
-            Vector3d normal = {0, x, z};
+            Vector3d normal = {0, 1.0, 0};
             build_vector(start, normal, 0.1, yellow);
         }
     }
@@ -716,7 +716,7 @@ GLuint create_car() {
 }
 
 void build_vector(Vector3d p, Vector3d q, double scale, const double *color) {
-    double magnitude = sqrt( pow(q.x,2) * pow(q.y,2) + pow(q.z,2) );
+    double magnitude = sqrt( pow(q.x,2) + pow(q.y,2) + pow(q.z,2) );
     double x = (q.x / magnitude) * scale;
     double y = (q.y / magnitude) * scale;
     double z = (q.z / magnitude) * scale;
