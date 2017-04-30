@@ -1,6 +1,7 @@
 #include "frogger.h"
 #include "settings.h"
 #include "frog.h"
+#include "camera.h"
 
 Frog frogger = {
         .sphere={.radius=0.05},
@@ -10,7 +11,7 @@ Frog frogger = {
 
 Settings mode = {.segments=8, .axes=true, .wireframe=true};
 
-Camera camera;
+Camera camera = {.zoom=1};
 
 GLfloat light_position[] = { 1, 1, 1, 0 };
 GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
@@ -202,6 +203,8 @@ void mouseState(int button, int state, int x, int y) {
     } else if( button == GLUT_RIGHT_BUTTON ) {
         if(state == GLUT_UP) return;
 
+        camera.zoom = (camera.zoom < 1.5f) ? 2 : 1;
+
         // Input zoom here
 //        camera.zoom += 0.01f;
     } else {
@@ -323,6 +326,7 @@ void keyboard(unsigned char key, int x, int y) {
             printf("\'space\': jump\n");
             printf("\'left mouse\': rotate camera\n");
             printf("\'right mouse\': zoom camera\n");
+            printf("\'mouse wheel\': zoom camera\n");
             printf("\'left arrow\': rotate frog left\n");
             printf("\'right arrow\': rotate frog right\n");
             printf("\'+/-\': double/halve segment amount\n");
@@ -358,7 +362,8 @@ void camera_movement() {
     glTranslated(camera.pos.x, camera.pos.y, camera.pos.z);
 
     // Zoom by translating along the Z axis
-    glTranslated(0, 0, camera.zoom);
+//    glTranslated(0, 0, camera.zoom);
+    glScaled(camera.zoom, camera.zoom, camera.zoom);
 
     // Request a new frame
     glutPostRedisplay();
