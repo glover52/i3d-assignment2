@@ -1,5 +1,6 @@
 #include "frogger.h"
 #include "settings.h"
+#include "frog.h"
 
 Frog frogger = {
         .sphere={.radius=0.05},
@@ -132,12 +133,12 @@ void display() {
 //    glutPostRedisplay();
 
     camera_movement();
+    draw_grid(mode.segments);
     draw_axes(1.0f);
     draw_sphere();
     draw_parabola();
     draw_velocity();
     draw_obstacles();
-    draw_grid(mode.segments);
     draw_extras(mode.tangents, mode.normals);
 
     glutSwapBuffers();
@@ -453,7 +454,7 @@ void draw_velocity() {
     glPushAttrib(GL_CURRENT_BIT);
     glBegin(GL_LINES);
     velocity_cartesian v = polar_to_cartesian(frogger.launch_velocity, frogger.rotation);
-    build_vector(frogger.launch_location, v, 0.2, magenta);
+    build_vector(frogger.launch_location, v, frogger.launch_velocity.speed * 0.15f, magenta);
     glEnd();
     glPopAttrib();
 
