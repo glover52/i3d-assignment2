@@ -21,7 +21,7 @@ Interactive 3D Graphics and Animation
 - [X] Draw moving cylinders to represent logs, and moving cubes to represent cars.
 - [-] Draw normal vectors for all geometry being rendered (only tangents for the parabola however).
 - [X] Apply lighting to all geometry.
-- [ ] Apply texturing to the logs, and optionally cars and ground plane.
+- [-] Apply texturing to the logs, and optionally cars and ground plane.
 - [X] Add keyboard controls for for toggling lighting/texturing/wireframe mode
 
 ### Compile and Run
@@ -29,6 +29,19 @@ Interactive 3D Graphics and Animation
     make
     ./frogger
 
-### Notes
-
-Controls: see http://goanna.cs.rmit.edu.au/~gl/teaching/Interactive3D/2017/assigns/assign2.html
+### Controls
+'o': toggle axes
+'n': toggle normals
+'p': toggle wireframe
+'l': toggle lighting
+'t': toggle textures
+'w': increase speed
+'s': decrease speed
+'a': increase angle
+'d': decrease angle
+'space': jump
+'left mouse': rotate camera
+'right mouse': zoom camera
+'left arrow': rotate frog left
+'right arrow': rotate frog right
+'+/-': double/halve segment amount
