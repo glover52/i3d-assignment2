@@ -19,6 +19,6 @@ typedef struct {
 
 typedef Vector3d velocity_cartesian;
 
-velocity_cartesian polar_to_cartesian(VelocityPolar);
+velocity_cartesian polar_to_cartesian(VelocityPolar, double rotation);
 
 #endif

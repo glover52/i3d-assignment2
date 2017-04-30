@@ -3,14 +3,15 @@
 
 Frog frogger = {
         .sphere={.radius=0.05},
-        .launch_velocity={1.0, 1.0}
+        .launch_velocity={1.0, 1.0},
+        .rotation=0.0
 };
 
 Settings mode = {.segments=8, .axes=true, .wireframe=true};
 
 Camera camera;
 
-GLfloat light_position[] = { -1, 1, 1, 0 };
+GLfloat light_position[] = { 1, 1, 1, 0 };
 GLfloat mat_specular[] = { 1.0, 1.0, 1.0, 1.0 };
 GLfloat mat_shininess[] = { 100.0 };
 
@@ -214,11 +215,11 @@ void specialKeyboard(int key, int x, int y) {
     switch (key) {
         case GLUT_KEY_LEFT:
             if(!mode.jumping)
-                frogger.rotation += 6;
+                frogger.rotation += 0.1;
             break;
         case GLUT_KEY_RIGHT:
             if(!mode.jumping)
-                frogger.rotation -= 6;
+                frogger.rotation -= 0.1;
             break;
         default:
             break;
@@ -281,7 +282,7 @@ void keyboard(unsigned char key, int x, int y) {
         case ' ':
             if (mode.jumping)
                 break;
-            frogger.velocity = polar_to_cartesian(frogger.launch_velocity);
+            frogger.velocity = polar_to_cartesian(frogger.launch_velocity, frogger.rotation);
             mode.jump_start_timestamp = glutGet(GLUT_ELAPSED_TIME)
                                         / millis_per_sec;
             mode.jumping = true;
@@ -451,7 +452,7 @@ void draw_velocity() {
 
     glPushAttrib(GL_CURRENT_BIT);
     glBegin(GL_LINES);
-    velocity_cartesian v = polar_to_cartesian(frogger.launch_velocity);
+    velocity_cartesian v = polar_to_cartesian(frogger.launch_velocity, frogger.rotation);
     build_vector(frogger.launch_location, v, 0.2, magenta);
     glEnd();
     glPopAttrib();
@@ -568,14 +569,16 @@ void build_parabola(void) {
     for (int i = 0; i <= mode.segments; i++) {
         double t = i * step;
 
-        double x = frogger.launch_velocity.speed * t
+        double magnitude = frogger.launch_velocity.speed * t
                     * cos(frogger.launch_velocity.angle);
 
         double y = frogger.launch_velocity.speed * t
                     * sin(frogger.launch_velocity.angle)
                     + 0.5f * gravity * t * t;
 
-        double z = 0; // x * tan(frogger.rotation);
+        double x = magnitude * cos(frogger.rotation);
+        double z = magnitude * sin(frogger.rotation);
+
 
         glVertex3d(x + frogger.launch_location.x, y, z + frogger.launch_location.z);
     }
@@ -608,24 +611,26 @@ void build_parabola_extras(bool tangents, bool normals) {
                       * sin(frogger.launch_velocity.angle);
     double step = distance / mode.segments;
 
-    velocity_cartesian v0 = polar_to_cartesian(frogger.launch_velocity);
+    velocity_cartesian v0 = polar_to_cartesian(frogger.launch_velocity, frogger.rotation);
 
     for (int i = 0; i <= mode.segments; i++) {
         double t = i * step;
 
         double vx = v0.x;
         double vy = v0.y + gravity * t;
-        double vz = 0.0;
+        double vz = v0.z;
 
-        double x = frogger.launch_velocity.speed * t
-                   * cos(frogger.launch_velocity.angle);
+        double magnitude = frogger.launch_velocity.speed * t
+                    * cos(frogger.launch_velocity.angle);
+
         double y = frogger.launch_velocity.speed * t
-                   * sin(frogger.launch_velocity.angle)
-                   + 0.5 * gravity * t * t;
+                    * sin(frogger.launch_velocity.angle)
+                    + 0.5f * gravity * t * t;
 
-        double z = 0; // x * tan(frogger.rotation);
+        double x = magnitude * cos(frogger.rotation);
+        double z = magnitude * sin(frogger.rotation);
 
-        Vector3d start = {frogger.launch_location.x + x , y, z};
+        Vector3d start = {frogger.launch_location.x + x , y, frogger.launch_location.z + z};
 
         if (tangents) {
             Vector3d tangent = {vx, vy, vz};
