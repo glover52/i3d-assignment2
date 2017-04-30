@@ -97,7 +97,7 @@ void build_grid_extras(bool);
 
 void build_obstacles(void);
 
-GLuint create_log(void);
+GLuint create_log(int segments);
 
 GLuint create_car(void);
 

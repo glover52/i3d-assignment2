@@ -66,7 +66,7 @@ void init() {
     srand( time(NULL) );
 
     the_car = create_car();
-    the_log = create_log();
+    the_log = create_log(mode.segments);
 
     // Initial offset for each car / log
     for (int i = 0; i < N_LOGS; i++)
@@ -290,13 +290,17 @@ void keyboard(unsigned char key, int x, int y) {
         /* Increase/Decrease amount of segments */
         case '+':
         case '=':
-            if (mode.segments < 64)
+            if (mode.segments < 64) {
                 mode.segments *= 2;
+                the_log = create_log(mode.segments);
+            }
             break;
         case '-':
         case '_':
-            if (mode.segments > 4)
+            if (mode.segments > 4) {
                 mode.segments /= 2;
+                the_log = create_log(mode.segments);
+            }
             break;
 
         /* Exit the program */
@@ -681,7 +685,7 @@ void build_obstacles() {
     glPopAttrib();
 }
 
-GLuint create_log() {
+GLuint create_log(int segments) {
     GLUquadricObj *quadric = gluNewQuadric();
 
     GLuint theLog = glGenLists(1);
@@ -690,7 +694,7 @@ GLuint create_log() {
     glShadeModel(GL_FLAT);
     double radius = 0.05;
     double height = 0.2;
-    gluCylinder(quadric, radius, radius, height, 8, 8);
+    gluCylinder(quadric, radius, radius, height, segments, segments);
 
     glEndList();
 
