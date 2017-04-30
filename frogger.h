@@ -28,6 +28,7 @@
 #include "colours.h"
 #include "settings.h"
 #include "camera.h"
+#include "texture.h"
 
 #include <sys/time.h>
 

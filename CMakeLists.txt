@@ -5,7 +5,7 @@ set(CMAKE_C_COMPILER gcc)
 set(CMAKE_C_STANDARD 11)
 set(CMAKE_C_FLAGS "-Wall -pedantic -Wno-deprecated-declarations")
 
-set(SOURCE_FILES frogger.c vectors.c frog.h colours.h settings.h sphere.h invariants.h camera.h)
+set(SOURCE_FILES frogger.c vectors.c frog.h colours.h settings.h sphere.h invariants.h camera.h texture.h texture.c)
 
 add_executable(frogger ${SOURCE_FILES})
 

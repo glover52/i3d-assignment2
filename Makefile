@@ -1,6 +1,6 @@
 CC=gcc
 CFLAGS=-Wall --pedantic -Wno-deprecated-declarations -std=c11
-LIBS=-lm -lGL -lGLU -lglut
+LIBS=-lGL -lGLU -lglut -lm ./libSOIL.a
 
 # Windows (cygwin)
 ifeq ($(OS), "Windows_NT")
@@ -9,7 +9,7 @@ endif
 
 # OS X
 ifeq "$(shell uname)" "Darwin"
-LIBS = -framework Carbon -framework OpenGL -framework GLUT
+LIBS = -framework Carbon -framework QuickTime -framework OpenGL -framework GLUT
 endif
 
 SOURCES=$(wildcard *.c)
