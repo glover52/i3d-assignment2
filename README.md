@@ -42,6 +42,7 @@ Interactive 3D Graphics and Animation
 'space': jump
 'left mouse': rotate camera
 'right mouse': zoom camera
+'mouse wheel': zoom camera
 'left arrow': rotate frog left
 'right arrow': rotate frog right
 '+/-': double/halve segment amount
